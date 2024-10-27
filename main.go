@@ -122,7 +122,19 @@ func handleConnection(conn net.Conn, store *KeyValueStore) {
                 conn.Write([]byte("Usage: SET <key> <value>\n"))
                 continue
             }
-            store.Set(command[1], command[2])
+            store.Set(command[1], command[2],0)
+            conn.Write([]byte("OK\n"))
+        case "SETEX":
+            if len(command) != 4 {
+              conn.Write([]byte("Usage: SETEX <key> <value> <ttl>"))
+              continue
+            }
+            ttl, err := time.ParseDuration(command[3] + "s")
+            if err != nil {
+              conn.Write([]byte("Invalid TTL\n"))
+              continue
+            }
+            store.set(command[1],command[2],command[3])
             conn.Write([]byte("OK\n"))
         case "GET":
             if len(command) != 2 {
