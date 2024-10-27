@@ -67,7 +67,7 @@ func (store *KeyValueStore) Set(key, value string,ttl time.Duration) {
 
     store.data[key] = &Item{
       value:value,
-      expires:expires
+      expires:expires,
     }
 }
 
