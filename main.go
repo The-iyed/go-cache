@@ -11,8 +11,8 @@ import (
 )
 
 type Item struct {
-  value string
-  expiry time.Time
+    value   string
+    expires time.Time
 }
 
 type KeyValueStore struct {
@@ -25,69 +25,67 @@ func NewKeyValueStore() *KeyValueStore {
         data: make(map[string]Item),
     }
     go store.Clean()
-    return store 
+    return store
 }
 
-func (store *KeyValueStore) Clean(){
-  ticker := time.NewTicker(5 * time.Second)
-  defer ticker.Stop()
+func (store *KeyValueStore) Clean() {
+    ticker := time.NewTicker(5 * time.Second)
+    defer ticker.Stop()
 
-  for range ticker.C {
-    expired := []string{}
-    now := time.Now()
+    for range ticker.C {
+        expired := []string{}
+        now := time.Now()
 
-    store.mu.RLock()
-    for key , item := range store.data {
-      if !item.expires.IsZero() && now.After(item.expires) {
-        expired = append(expired, key)
-      }
+        store.mu.RLock()
+        for key, item := range store.data {
+            if !item.expires.IsZero() && now.After(item.expires) {
+                expired = append(expired, key)
+            }
+        }
+        store.mu.RUnlock()
+
+        if len(expired) > 0 {
+            store.mu.Lock()
+            for _, key := range expired {
+                delete(store.data, key)
+            }
+            store.mu.Unlock()
+        }
     }
-
-    store.mu.RUnlock()
-
-    if len(expired) > 0 {
-      store.mu.Lock()
-      for _ , key := range expired {
-        delete(store.data,key)
-      }
-      store.mu.Unlock()
-    }
-
-  }
 }
 
-func (store *KeyValueStore) Set(key, value string,ttl time.Duration) {
+func (store *KeyValueStore) Set(key, value string, ttl time.Duration) {
     store.mu.Lock()
     defer store.mu.Unlock()
 
     expires := time.Time{}
     if ttl > 0 {
-      expires = time.Now().Add(ttl)
+        expires = time.Now().Add(ttl)
     }
 
-    store.data[key] = &Item{
-      value:value,
-      expires:expires,
+    store.data[key] = Item{
+        value:   value,
+        expires: expires,
     }
 }
 
 func (store *KeyValueStore) Get(key string) (string, bool) {
     store.mu.RLock()
-    defer store.mu.RUnlock()
-    item , exist := store.data[key]
+    item, exist := store.data[key]
+    store.mu.RUnlock()
 
     if !exist {
-      return "" , false  
+        return "", false
     }
 
     if !item.expires.IsZero() && time.Now().After(item.expires) {
-      store.mu.Lock()
-      delete(store.data,key)
-      store.mu.Unlock()
-      return "" , false
+        store.mu.Lock()
+        delete(store.data, key)
+        store.mu.Unlock()
+        return "", false
     }
 
-    return item.value, false
+    return item.value, true
 }
 
 func (store *KeyValueStore) Delete(key string) {
@@ -119,19 +117,19 @@ func handleConnection(conn net.Conn, store *KeyValueStore) {
                 conn.Write([]byte("Usage: SET <key> <value>\n"))
                 continue
             }
-            store.Set(command[1], command[2],0)
+            store.Set(command[1], command[2], 0)
             conn.Write([]byte("OK\n"))
         case "SETEX":
             if len(command) != 4 {
-              conn.Write([]byte("Usage: SETEX <key> <value> <ttl>"))
-              continue
+                conn.Write([]byte("Usage: SETEX <key> <value> <ttl>\n"))
+                continue
             }
             ttl, err := time.ParseDuration(command[3] + "s")
             if err != nil {
-              conn.Write([]byte("Invalid TTL\n"))
-              continue
+                conn.Write([]byte("Invalid TTL\n"))
+                continue
             }
-            store.Set(command[1],command[2],command[3])
+            store.Set(command[1], command[2], ttl)
             conn.Write([]byte("OK\n"))
         case "GET":
             if len(command) != 2 {
