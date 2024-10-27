@@ -29,8 +29,7 @@ func NewKeyValueStore() *KeyValueStore {
 }
 
 func (store *KeyValueStore) Clean(){
-  // running clean job every 5 seconds <====> redis are running their cleaner every 100 milliseconds //
-  ticker := time.Ticker(5 * time.Second)
+  ticker := time.NewTicker(5 * time.Second)
   defer ticker.Stop()
 
   for range ticker.C {
@@ -63,7 +62,7 @@ func (store *KeyValueStore) Set(key, value string,ttl time.Duration) {
 
     expires := time.Time{}
     if ttl > 0 {
-      expires := time.Now().Add(ttl)
+      expires = time.Now().Add(ttl)
     }
 
     store.data[key] = &Item{
@@ -82,11 +81,9 @@ func (store *KeyValueStore) Get(key string) (string, bool) {
     }
 
     if !item.expires.IsZero() && time.Now().After(item.expires) {
-      store.mu.RUnlock()
       store.mu.Lock()
       delete(store.data,key)
-      store.mu.RLock()
-      store.mu.Rlock()
+      store.mu.Unlock()
       return "" , false
     }
 
@@ -134,7 +131,7 @@ func handleConnection(conn net.Conn, store *KeyValueStore) {
               conn.Write([]byte("Invalid TTL\n"))
               continue
             }
-            store.set(command[1],command[2],command[3])
+            store.Set(command[1],command[2],command[3])
             conn.Write([]byte("OK\n"))
         case "GET":
             if len(command) != 2 {
