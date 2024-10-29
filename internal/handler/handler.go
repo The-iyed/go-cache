@@ -87,6 +87,17 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			} else {
 				conn.Write([]byte("(integer) 0\n"))
 			}
+        case "TTL":
+            if len(command) != 2 {
+                conn.Write([]byte("Usage: TTL <key>\n"))
+                continue
+            }
+            ttl := kvStore.TTL(command[1])
+            if ttl == -2 {
+                conn.Write([]byte("(nil)\n"))
+            } else {
+                conn.Write([]byte(fmt.Sprintf("(integer) %d\n", ttl)))
+            }
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}
