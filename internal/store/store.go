@@ -13,6 +13,10 @@ type Item struct {
 	expires time.Time
 }
 
+func (i *Item) IsExpired() bool {
+	return !i.expires.IsZero() && time.Now().After(i.expires)
+}
+
 type KeyValueStore struct {
 	data map[string]Item
 	mu   sync.RWMutex
@@ -143,67 +147,97 @@ func (store *KeyValueStore) TTL(key string) int64 {
 	return int64(remaining)
 }
 
-
 func (store *KeyValueStore) FlushAll() {
-    store.mu.Lock()
-    defer store.mu.Unlock()
-    store.data = make(map[string]Item) 
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	store.data = make(map[string]Item)
 }
 
-
 func (store *KeyValueStore) Info() string {
-    store.mu.RLock()
-    defer store.mu.RUnlock()
+	store.mu.RLock()
+	defer store.mu.RUnlock()
 
+	var totalSize int
+	for _, item := range store.data {
+		totalSize += len(item.value)
+	}
 
-    var totalSize int
-    for _, item := range store.data {
-        totalSize += len(item.value)
-    }
+	info := fmt.Sprintf(
+		"ICache Server\n"+
+			"Number of Keys: %d\n"+
+			"Total Size: %d bytes\n"+
+			"Memory Usage: %.2f KB\n",
+		len(store.data),
+		totalSize,
+		float64(totalSize)/1024,
+	)
 
-    info := fmt.Sprintf(
-        "ICache Server\n"+
-            "Number of Keys: %d\n"+
-            "Total Size: %d bytes\n"+
-            "Memory Usage: %.2f KB\n", 
-        len(store.data),
-        totalSize,
-        float64(totalSize)/1024, 
-    )
-
-    return info
+	return info
 }
 
 func (store *KeyValueStore) Ping() string {
-    return "PONG"
+	return "PONG"
 }
 
-
 func (store *KeyValueStore) Expire(key string, seconds int) bool {
-    store.mu.Lock()
-    defer store.mu.Unlock()
+	store.mu.Lock()
+	defer store.mu.Unlock()
 
-    item, exists := store.data[key]
-    if !exists {
-        return false
-    }
+	item, exists := store.data[key]
+	if !exists {
+		return false
+	}
 
-    item.expires = time.Now().Add(time.Duration(seconds) * time.Second)
-    store.data[key] = item
-    return true
+	item.expires = time.Now().Add(time.Duration(seconds) * time.Second)
+	store.data[key] = item
+	return true
 }
 
 func (store *KeyValueStore) Persist(key string) bool {
-    store.mu.Lock()
-    defer store.mu.Unlock()
+	store.mu.Lock()
+	defer store.mu.Unlock()
 
-    item, exists := store.data[key]
-    if !exists {
-        return false
-    }
+	item, exists := store.data[key]
+	if !exists {
+		return false
+	}
 
-    item.expires = time.Time{} 
-    store.data[key] = item
-    return true
+	item.expires = time.Time{}
+	store.data[key] = item
+	return true
 }
 
+func (kv *KeyValueStore) MSET(pairs ...string) {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+
+	if len(pairs)%2 != 0 {
+		return
+	}
+
+	for i := 0; i < len(pairs); i += 2 {
+		key := pairs[i]
+		value := pairs[i+1]
+		kv.data[key] = Item{
+			value:   value,
+			expires: time.Time{},
+		}
+	}
+}
+
+func (store *KeyValueStore) MGET(keys ...string) []string {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+
+	results := make([]string, len(keys))
+
+	for i, key := range keys {
+		item, exists := store.data[key]
+		if !exists || item.IsExpired() {
+			results[i] = "(nil)"
+		} else {
+			results[i] = item.value
+		}
+	}
+	return results
+}

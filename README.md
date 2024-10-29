@@ -12,6 +12,11 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `EXISTS <key>` - Check if the specified key exists.
   - `TTL <key>` - Get the remaining time to live for a key (returns the TTL in seconds, `-1` if the key has no expiration, or `-2` if the key does not exist).
   - `KEYS <pattern>` - Retrieve all keys matching a pattern, with responses formatted like Redis.
+  - `FLUSHALL` - Delete all keys from all databases.
+  - `INFO` - Get information and statistics about the server, including memory usage and other details.
+  - `PING` - Check the connection to the server.
+  - `EXPIRE <key> <seconds>` - Set a timeout on the specified key after which it will be automatically deleted.
+  - `PERSIST <key>` - Remove the expiration from a key, making it persistent.
 
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.

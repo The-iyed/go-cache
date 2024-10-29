@@ -145,6 +145,22 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			} else {
 				conn.Write([]byte("(nil)\n"))
 			}
+		case "MSET":
+			if len(command) < 3 || len(command)%2 == 0 {
+				conn.Write([]byte("Usage: MSET <key1> <value1> [<key2> <value2> ...]\n"))
+				continue
+			}
+			kvStore.MSET(command[1:]...)
+			conn.Write([]byte("OK\n"))
+
+		case "MGET":
+			if len(command) < 2 {
+				conn.Write([]byte("Usage: MGET <key1> [<key2> ...]\n"))
+				continue
+			}
+			values := kvStore.MGET(command[1:]...)
+			response := strings.Join(values, "\n") + "\n"
+			conn.Write([]byte(response))
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}
