@@ -76,7 +76,17 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 				response.WriteString(fmt.Sprintf("%d) \"%s\"\n", i+1, key))
 			}
 			conn.Write([]byte(response.String()))
-
+		case "EXISTS":
+			if len(command) != 2 {
+				conn.Write([]byte("Usage: EXISTS <key>\n"))
+				continue
+			}
+			exist := kvStore.Exist(command[1])
+			if exist {
+				conn.Write([]byte("(integer) 1\n"))
+			} else {
+				conn.Write([]byte("(integer) 0\n"))
+			}
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}

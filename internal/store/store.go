@@ -8,106 +8,115 @@ import (
 )
 
 type Item struct {
-    value   string
-    expires time.Time
+	value   string
+	expires time.Time
 }
 
 type KeyValueStore struct {
-    data map[string]Item
-    mu   sync.RWMutex
+	data map[string]Item
+	mu   sync.RWMutex
 }
 
 func NewKeyValueStore() *KeyValueStore {
-    store := &KeyValueStore{
-        data: make(map[string]Item),
-    }
-    go store.Clean()
-    return store
+	store := &KeyValueStore{
+		data: make(map[string]Item),
+	}
+	go store.Clean()
+	return store
 }
 
 func (store *KeyValueStore) Clean() {
-    ticker := time.NewTicker(5 * time.Second)
-    defer ticker.Stop()
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 
-    for range ticker.C {
-        expired := []string{}
-        now := time.Now()
+	for range ticker.C {
+		expired := []string{}
+		now := time.Now()
 
-        store.mu.RLock()
-        for key, item := range store.data {
-            if !item.expires.IsZero() && now.After(item.expires) {
-                expired = append(expired, key)
-            }
-        }
-        store.mu.RUnlock()
+		store.mu.RLock()
+		for key, item := range store.data {
+			if !item.expires.IsZero() && now.After(item.expires) {
+				expired = append(expired, key)
+			}
+		}
+		store.mu.RUnlock()
 
-        if len(expired) > 0 {
-            store.mu.Lock()
-            for _, key := range expired {
-                delete(store.data, key)
-            }
-            store.mu.Unlock()
-        }
-    }
+		if len(expired) > 0 {
+			store.mu.Lock()
+			for _, key := range expired {
+				delete(store.data, key)
+			}
+			store.mu.Unlock()
+		}
+	}
 }
 
 func (store *KeyValueStore) Set(key, value string, ttl time.Duration) {
-    store.mu.Lock()
-    defer store.mu.Unlock()
+	store.mu.Lock()
+	defer store.mu.Unlock()
 
-    expires := time.Time{}
-    if ttl > 0 {
-        expires = time.Now().Add(ttl)
-    }
+	expires := time.Time{}
+	if ttl > 0 {
+		expires = time.Now().Add(ttl)
+	}
 
-    store.data[key] = Item{
-        value:   value,
-        expires: expires,
-    }
+	store.data[key] = Item{
+		value:   value,
+		expires: expires,
+	}
 }
 
 func (store *KeyValueStore) Get(key string) (string, bool) {
-    store.mu.RLock()
-    item, exist := store.data[key]
-    store.mu.RUnlock()
+	store.mu.RLock()
+	item, exist := store.data[key]
+	store.mu.RUnlock()
 
-    if !exist {
-        return "", false
-    }
+	if !exist {
+		return "", false
+	}
 
-    if !item.expires.IsZero() && time.Now().After(item.expires) {
-        store.mu.Lock()
-        delete(store.data, key)
-        store.mu.Unlock()
-        return "", false
-    }
+	if !item.expires.IsZero() && time.Now().After(item.expires) {
+		store.mu.Lock()
+		delete(store.data, key)
+		store.mu.Unlock()
+		return "", false
+	}
 
-    return item.value, true
+	return item.value, true
 }
 
 func (store *KeyValueStore) Delete(key string) {
-    store.mu.Lock()
-    defer store.mu.Unlock()
-    delete(store.data, key)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	delete(store.data, key)
 }
 
-
 func (store *KeyValueStore) Keys(pattern string) []string {
-    store.mu.RLock()
-    defer store.mu.RUnlock()
+	store.mu.RLock()
+	defer store.mu.RUnlock()
 
-    var keys []string
+	var keys []string
 
-    useRegex := strings.Contains(pattern, "*")
-    var re *regexp.Regexp
-    if useRegex {
-        re = regexp.MustCompile("^" + strings.ReplaceAll(regexp.QuoteMeta(pattern), "\\*", ".*") + "$")
-    }
+	useRegex := strings.Contains(pattern, "*")
+	var re *regexp.Regexp
+	if useRegex {
+		re = regexp.MustCompile("^" + strings.ReplaceAll(regexp.QuoteMeta(pattern), "\\*", ".*") + "$")
+	}
 
-    for key := range store.data {
-        if !useRegex && pattern == "*" || useRegex && re.MatchString(key) {
-            keys = append(keys, key)
-        }
-    }
-    return keys
+	for key := range store.data {
+		if !useRegex && pattern == "*" || useRegex && re.MatchString(key) {
+			keys = append(keys, key)
+		}
+	}
+	return keys
+}
+
+func (store *KeyValueStore) Exist(key string) bool {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+
+	_, exist := store.data[key]
+
+	return exist
+
 }
