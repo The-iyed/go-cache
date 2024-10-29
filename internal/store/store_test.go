@@ -21,13 +21,13 @@ func TestSetAndGet(t *testing.T) {
 func TestExpireKey(t *testing.T) {
 	kvStore := NewKeyValueStore()
 
-	kvStore.Set("key1", "value1", 2*time.Second)
+	kvStore.Set("key1", "value1", 1*time.Second)
 
 	value, exist := kvStore.Get("key1")
 	if !exist || value != "value1" {
 		t.Errorf("Expected value1, got %s (exist: %v)", value, exist)
 	}
-	time.Sleep(4 * time.Second)
+	time.Sleep(2 * time.Second)
 	_, exist = kvStore.Get("key2")
 	if exist {
 		t.Errorf("Expected key2 to be expired")
