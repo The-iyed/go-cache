@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -119,6 +120,31 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			}
 			ping := kvStore.Ping()
 			conn.Write([]byte(ping + "\n"))
+		case "PERSIST":
+			if len(command) != 2 {
+				conn.Write([]byte("Usage: PERSIST <key>\n"))
+				continue
+			}
+			if kvStore.Persist(command[1]) {
+				conn.Write([]byte("OK\n"))
+			} else {
+				conn.Write([]byte("(nil)\n"))
+			}
+		case "EXPIRE":
+			if len(command) != 3 {
+				conn.Write([]byte("Usage: EXPIRE <key> <seconds>\n"))
+				continue
+			}
+			seconds, err := strconv.Atoi(command[2])
+			if err != nil {
+				conn.Write([]byte("Invalid seconds\n"))
+				continue
+			}
+			if kvStore.Expire(command[1], seconds) {
+				conn.Write([]byte("OK\n"))
+			} else {
+				conn.Write([]byte("(nil)\n"))
+			}
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}

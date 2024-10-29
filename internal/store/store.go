@@ -178,3 +178,32 @@ func (store *KeyValueStore) Ping() string {
     return "PONG"
 }
 
+
+func (store *KeyValueStore) Expire(key string, seconds int) bool {
+    store.mu.Lock()
+    defer store.mu.Unlock()
+
+    item, exists := store.data[key]
+    if !exists {
+        return false
+    }
+
+    item.expires = time.Now().Add(time.Duration(seconds) * time.Second)
+    store.data[key] = item
+    return true
+}
+
+func (store *KeyValueStore) Persist(key string) bool {
+    store.mu.Lock()
+    defer store.mu.Unlock()
+
+    item, exists := store.data[key]
+    if !exists {
+        return false
+    }
+
+    item.expires = time.Time{} 
+    store.data[key] = item
+    return true
+}
+
