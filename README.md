@@ -6,9 +6,9 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
 
 - **Data Storage Commands**
   - `SET <key> <value>` - Store a key-value pair.
+  - `SETEX <key> <value> <ttl>` - Store a key-value pair with an expiration time (TTL).
   - `GET <key>` - Retrieve the value of a key.
   - `DEL <key>` - Delete a key-value pair.
-  - `SETEX <key> <value> <ttl>` - Store a key-value pair with an expiration time (TTL).
   - `EXISTS <key>` - Check if the specified key exists.
   - `TTL <key>` - Get the remaining time to live for a key (returns the TTL in seconds, `-1` if the key has no expiration, or `-2` if the key does not exist).
   - `KEYS <pattern>` - Retrieve all keys matching a pattern, with responses formatted like Redis.
@@ -17,6 +17,10 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `PING` - Check the connection to the server.
   - `EXPIRE <key> <seconds>` - Set a timeout on the specified key after which it will be automatically deleted.
   - `PERSIST <key>` - Remove the expiration from a key, making it persistent.
+  - `MSET <key1> <value1> [<key2> <value2> ...]` - Set multiple key-value pairs at once.
+  - `MGET <key1> [<key2> ...]` - Retrieve multiple values for the given keys.
+  - `UPDATE <key> <value>` - Update the value of a key if it exists.
+  - `GETSET <key> <value>` - Set the value of a key and return its old value.
 
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.
