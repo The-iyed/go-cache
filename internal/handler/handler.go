@@ -87,17 +87,17 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			} else {
 				conn.Write([]byte("(integer) 0\n"))
 			}
-        case "TTL":
-            if len(command) != 2 {
-                conn.Write([]byte("Usage: TTL <key>\n"))
-                continue
-            }
-            ttl := kvStore.TTL(command[1])
-            if ttl == -2 {
-                conn.Write([]byte("(nil)\n"))
-            } else {
-                conn.Write([]byte(fmt.Sprintf("(integer) %d\n", ttl)))
-            }
+		case "TTL":
+			if len(command) != 2 {
+				conn.Write([]byte("Usage: TTL <key>\n"))
+				continue
+			}
+			ttl := kvStore.TTL(command[1])
+			if ttl == -2 {
+				conn.Write([]byte("(nil)\n"))
+			} else {
+				conn.Write([]byte(fmt.Sprintf("(integer) %d\n", ttl)))
+			}
 		case "FLUSHALL":
 			if len(command) != 1 {
 				conn.Write([]byte("Usage: FLUSHALL\n"))
@@ -112,6 +112,13 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			}
 			info := kvStore.Info()
 			conn.Write([]byte(info + "\n"))
+		case "PING":
+			if len(command) != 1 {
+				conn.Write([]byte("Usage: PING\n"))
+				continue
+			}
+			ping := kvStore.Ping()
+			conn.Write([]byte(ping + "\n"))
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}

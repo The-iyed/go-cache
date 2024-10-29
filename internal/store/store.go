@@ -170,5 +170,11 @@ func (store *KeyValueStore) Info() string {
         totalSize,
         float64(totalSize)/1024, 
     )
+
     return info
 }
+
+func (store *KeyValueStore) Ping() string {
+    return "PONG"
+}
+
