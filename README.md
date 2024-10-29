@@ -25,6 +25,11 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.
 
+- **Pub/Sub Feature**
+  - **SUBSCRIBE <channel>** - Subscribe to a specified channel to receive messages published to that channel.
+  - **PUBLISH <channel> <message>** - Publish a message to a specified channel that all subscribers will receive.
+  - **UNSUBSCRIBE <channel>** - Unsubscribe from a specified channel, stopping message delivery.
+
 ## Future Features
 - **Persistence** - Save cache data to disk and load on startup.
 - **Advanced Data Structures** - Implement lists, sets, and other structures.
