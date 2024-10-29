@@ -47,3 +47,11 @@ func (ps *PubSub) Unsubscribe(channel string, ch <-chan string) {
 		}
 	}
 }
+
+func (ps *PubSub) GetNumSubscribers(channel string) int {
+	ps.mu.RLock()
+	defer ps.mu.RUnlock()
+
+	subscribers := ps.channels[channel]
+	return len(subscribers)
+}
