@@ -9,6 +9,10 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `GET <key>` - Retrieve the value of a key.
   - `DEL <key>` - Delete a key-value pair.
   - `SETEX <key> <value> <ttl>` - Store a key-value pair with an expiration time (TTL).
+  - `EXISTS <key>` - Check if the specified key exists.
+  - `TTL <key>` - Get the remaining time to live for a key (returns the TTL in seconds, `-1` if the key has no expiration, or `-2` if the key does not exist).
+  - `KEYS <pattern>` - Retrieve all keys matching a pattern, with responses formatted like Redis.
+
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.
 

@@ -98,6 +98,20 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
             } else {
                 conn.Write([]byte(fmt.Sprintf("(integer) %d\n", ttl)))
             }
+		case "FLUSHALL":
+			if len(command) != 1 {
+				conn.Write([]byte("Usage: FLUSHALL\n"))
+				continue
+			}
+			kvStore.FlushAll()
+			conn.Write([]byte("OK\n"))
+		case "INFO":
+			if len(command) != 1 {
+				conn.Write([]byte("Usage: INFO\n"))
+				continue
+			}
+			info := kvStore.Info()
+			conn.Write([]byte(info + "\n"))
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}
