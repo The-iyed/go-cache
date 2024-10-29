@@ -6,7 +6,12 @@ import (
 	"net"
 	"strings"
 
+	"github.com/go-redis-v1/internal/pubsub"
 	"github.com/go-redis-v1/internal/store"
+)
+
+var (
+	pubSubStore = pubsub.New()
 )
 
 func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
@@ -64,8 +69,55 @@ func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, command []string
 		handleUpdate(conn, kvStore, command)
 	case "GETSET":
 		handleGetSet(conn, kvStore, command)
+	case "PUBLISH":
+		handlePublish(conn, command)
+	case "SUBSCRIBE":
+		handleSubscribe(conn, command)
+	case "UNSUBSCRIBE":
+		handleUnsubscribe(conn, command)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}
 }
 
+func handlePublish(conn net.Conn, command []string) {
+	if len(command) != 3 {
+		conn.Write([]byte("Usage: PUBLISH <channel> <message>\n"))
+		return
+	}
+	channel := command[1]
+	message := command[2]
+	pubSubStore.Publish(channel, message)
+	conn.Write([]byte("Message published\n"))
+}
+
+func handleSubscribe(conn net.Conn, command []string) {
+	if len(command) != 2 {
+		conn.Write([]byte("Usage: SUBSCRIBE <channel>\n"))
+		return
+	}
+	channel := command[1]
+	messageChannel := make(chan string)
+	pubSubStore.Subscribe(channel)
+
+	go func() {
+		for message := range messageChannel {
+			conn.Write([]byte(message + "\n"))
+		}
+	}()
+
+	conn.Write([]byte("Subscribed to channel: " + channel + "\n"))
+}
+
+func handleUnsubscribe(conn net.Conn, command []string) {
+	if len(command) != 2 {
+		conn.Write([]byte("Usage: UNSUBSCRIBE <channel>\n"))
+		return
+	}
+	channel := command[1]
+	messageChannel := make(chan string)
+	pubSubStore.Unsubscribe(channel, messageChannel)
+
+	close(messageChannel)
+	conn.Write([]byte("Unsubscribed from channel: " + channel + "\n"))
+}
