@@ -8,14 +8,7 @@ import (
 	"time"
 )
 
-type Item struct {
-	value   string
-	expires time.Time
-}
 
-func (i *Item) IsExpired() bool {
-	return !i.expires.IsZero() && time.Now().After(i.expires)
-}
 
 type KeyValueStore struct {
 	data map[string]Item
@@ -241,3 +234,42 @@ func (store *KeyValueStore) MGET(keys ...string) []string {
 	}
 	return results
 }
+
+func (store *KeyValueStore) GETSET(key string, value string) (string, bool) {
+	store.mu.Lock()
+	defer store.mu.Unlock()
+
+	item, exists := store.data[key]
+	if exists && !item.IsExpired() {
+		oldValue := item.value
+		store.data[key] = Item{value: value, expires: item.expires}
+		return oldValue, true
+	}
+	store.data[key] = Item{value: value, expires: time.Time{}}
+	return "", false
+}
+
+func (kvs *KeyValueStore) Update(key string, value string) string {
+	kvs.mu.Lock()
+	defer kvs.mu.Unlock()
+
+	if item, exists := kvs.data[key]; exists {
+		kvs.data[key] = Item{value: value, expires: item.expires}
+		return item.value
+	}
+	return ""
+}
+
+
+func (kvs *KeyValueStore) GetSet(key string, value string) string {
+	kvs.mu.Lock()
+	defer kvs.mu.Unlock()
+
+	oldValue := ""
+	if item, exists := kvs.data[key]; exists {
+		oldValue = item.value
+	}
+	kvs.data[key] = Item{value: value, expires: time.Time{}}
+	return oldValue
+}
+

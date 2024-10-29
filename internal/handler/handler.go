@@ -161,6 +161,25 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			values := kvStore.MGET(command[1:]...)
 			response := strings.Join(values, "\n") + "\n"
 			conn.Write([]byte(response))
+		case "UPDATE":
+			if len(command) != 3 {
+				conn.Write([]byte("Usage: UPDATE <key> <value>\n"))
+				continue
+			}
+			oldValue := kvStore.Update(command[1], command[2])
+			if oldValue == "" {
+				conn.Write([]byte("Key does not exist\n"))
+			} else {
+				conn.Write([]byte("OK\n"))
+			}
+
+		case "GETSET":
+			if len(command) != 3 {
+				conn.Write([]byte("Usage: GETSET <key> <value>\n"))
+				continue
+			}
+			oldValue := kvStore.GetSet(command[1], command[2])
+			conn.Write([]byte(oldValue + "\n"))
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}

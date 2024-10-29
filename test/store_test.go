@@ -1,13 +1,15 @@
-package store
+package test
 
 import (
 	"log"
 	"testing"
 	"time"
+
+	"github.com/go-redis-v1/internal/store"
 )
 
 func TestSetAndGet(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 
 	kvStore.Set("key1", "value1", 5*time.Second)
 
@@ -20,7 +22,7 @@ func TestSetAndGet(t *testing.T) {
 }
 
 func TestExpireKey(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 
 	kvStore.Set("key1", "value1", 1*time.Second)
 
@@ -39,7 +41,7 @@ func TestExpireKey(t *testing.T) {
 }
 
 func TestDeleteKey(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 
 	kvStore.Set("key3", "value3", 0)
 
@@ -54,7 +56,7 @@ func TestDeleteKey(t *testing.T) {
 }
 
 func TestExistKey(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 
 	exist := kvStore.Exist("key11")
 	if exist {
@@ -71,7 +73,7 @@ func TestExistKey(t *testing.T) {
 }
 
 func TestTTL(t *testing.T) {
-	store := NewKeyValueStore()
+	store := store.NewKeyValueStore()
 
 	store.Set("key1", "value1", 5*time.Second)
 	ttl := store.TTL("key1")
@@ -101,7 +103,7 @@ func TestTTL(t *testing.T) {
 }
 
 func TestPersist(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 
 	kvStore.Set("key1", "value1", 5*time.Second)
 	kvStore.Persist("key1")
@@ -114,7 +116,7 @@ func TestPersist(t *testing.T) {
 }
 
 func TestMSETAndMGET(t *testing.T) {
-	kvStore := NewKeyValueStore()
+	kvStore := store.NewKeyValueStore()
 	kvStore.MSET("key1", "value1", "key2", "value2", "key3", "value3")
 
 	values := kvStore.MGET("key1", "key2", "key3")
@@ -129,5 +131,45 @@ func TestMSETAndMGET(t *testing.T) {
 	values = kvStore.MGET("nonExistentKey")
 	if values[0] != "(nil)" {
 		t.Errorf("TestMSETAndMGET: Expected (nil), got %s", values[0])
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	kvStore := store.NewKeyValueStore()
+	kvStore.Set("key1", "value1", 0)
+
+	oldValue := kvStore.Update("key1", "value2")
+	if oldValue != "value1" {
+		t.Errorf("TestUpdate: Expected old value 'value1', got '%s'", oldValue)
+	}
+
+	value, exist := kvStore.Get("key1")
+	if !exist || value != "value2" {
+		t.Errorf("TestUpdate: Expected value 'value2', got '%s' (exist: %v)", value, exist)
+	}
+
+	oldValue = kvStore.Update("key2", "value3")
+	if oldValue != "" {
+		t.Errorf("TestUpdate: Expected old value to be '', got '%s'", oldValue)
+	}
+}
+
+func TestGetSet(t *testing.T) {
+	kvStore := store.NewKeyValueStore()
+	kvStore.Set("key1", "value1", 0)
+
+	oldValue := kvStore.GetSet("key1", "newValue")
+	if oldValue != "value1" {
+		t.Errorf("TestGetSet: Expected old value to be 'value1', got '%s'", oldValue)
+	}
+
+	newValue, exist := kvStore.Get("key1")
+	if !exist || newValue != "newValue" {
+		t.Errorf("TestGetSet: Expected new value to be 'newValue', got '%s' (exist: %v)", newValue, exist)
+	}
+
+	oldValue = kvStore.GetSet("key2", "value2")
+	if oldValue != "" {
+		t.Errorf("TestGetSet: Expected old value to be '', got '%s'", oldValue)
 	}
 }
