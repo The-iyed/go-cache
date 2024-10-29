@@ -13,7 +13,7 @@ func TestSetAndGet(t *testing.T) {
 
 	value, exist := kvStore.Get("key1")
 	if !exist || value != "value1" {
-		t.Errorf("Expected value1, got %s (exist: %v)", value, exist)
+		t.Errorf("TestSetAndGet: Expected value1, got %s (exist: %v)", value, exist)
 	}
 
 }
@@ -25,12 +25,12 @@ func TestExpireKey(t *testing.T) {
 
 	value, exist := kvStore.Get("key1")
 	if !exist || value != "value1" {
-		t.Errorf("Expected value1, got %s (exist: %v)", value, exist)
+		t.Errorf("TestExpireKey: Expected value1, got %s (exist: %v)", value, exist)
 	}
 	time.Sleep(2 * time.Second)
 	_, exist = kvStore.Get("key2")
 	if exist {
-		t.Errorf("Expected key2 to be expired")
+		t.Errorf("TestExpireKey: Expected key2 to be expired")
 	}
 }
 
@@ -43,6 +43,22 @@ func TestDeleteKey(t *testing.T) {
 
   _, exist := kvStore.Get("key3")
   if exist {
-      t.Errorf("Expected key3 to be deleted")
+      t.Errorf("TestDeleteKey: Expected key3 to be deleted")
   }
+}
+
+func TestExistKey(t *testing.T){
+	kvStore := NewKeyValueStore()
+
+	exist := kvStore.Exist("key11")
+	if exist {
+		t.Errorf("TestExistKey: Expected key11 exsitance check should return false")
+	}
+
+	kvStore.Set("key11","value1",0)
+	exist = kvStore.Exist("key11")
+	if !exist {
+		t.Errorf("TestExistKey: Expected key11 exsitance check should return true")
+	}
+
 }
