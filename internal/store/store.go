@@ -1,8 +1,10 @@
 package store
 
 import (
-    "sync"
-    "time"
+	"regexp"
+	"strings"
+	"sync"
+	"time"
 )
 
 type Item struct {
@@ -89,3 +91,23 @@ func (store *KeyValueStore) Delete(key string) {
     delete(store.data, key)
 }
 
+
+func (store *KeyValueStore) Keys(pattern string) []string {
+    store.mu.RLock()
+    defer store.mu.RUnlock()
+
+    var keys []string
+
+    useRegex := strings.Contains(pattern, "*")
+    var re *regexp.Regexp
+    if useRegex {
+        re = regexp.MustCompile("^" + strings.ReplaceAll(regexp.QuoteMeta(pattern), "\\*", ".*") + "$")
+    }
+
+    for key := range store.data {
+        if !useRegex && pattern == "*" || useRegex && re.MatchString(key) {
+            keys = append(keys, key)
+        }
+    }
+    return keys
+}

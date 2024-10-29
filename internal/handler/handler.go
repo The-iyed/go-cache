@@ -65,6 +65,18 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			}
 			kvStore.Delete(command[1])
 			conn.Write([]byte("OK\n"))
+		case "KEYS":
+			if len(command) != 2 {
+				conn.Write([]byte("Usage: KEYS <pattern>\n"))
+				continue
+			}
+			keys := kvStore.Keys(command[1])
+			var response strings.Builder
+			for i, key := range keys {
+				response.WriteString(fmt.Sprintf("%d) \"%s\"\n", i+1, key))
+			}
+			conn.Write([]byte(response.String()))
+
 		default:
 			conn.Write([]byte("Unknown command\n"))
 		}
