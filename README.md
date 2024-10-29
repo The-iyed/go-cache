@@ -21,6 +21,8 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `MGET <key1> [<key2> ...]` - Retrieve multiple values for the given keys.
   - `UPDATE <key> <value>` - Update the value of a key if it exists.
   - `GETSET <key> <value>` - Set the value of a key and return its old value.
+  - `GETNSUM <channel> - Retrive the number of subscribers for a given channel.`
+
 
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.
@@ -29,6 +31,7 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - **SUBSCRIBE <channel>** - Subscribe to a specified channel to receive messages published to that channel.
   - **PUBLISH <channel> <message>** - Publish a message to a specified channel that all subscribers will receive.
   - **UNSUBSCRIBE <channel>** - Unsubscribe from a specified channel, stopping message delivery.
+  - **Message Persistence** - Stores recent messages in a buffer for each channel, allowing new subscribers to catch up on recent messages upon joining.
 
 ## Future Features
 - **Persistence** - Save cache data to disk and load on startup.
