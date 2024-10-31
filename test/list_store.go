@@ -12,7 +12,7 @@ func TestLPUSH(t *testing.T) {
 	store.LPUSH("mylist", "value2")
 
 	expected := []string{"value2", "value1"}
-	actual := store.LRANGE("mylist", 0, -1)
+	actual, _ := store.LRANGE("mylist", 0, -1)
 	for i, v := range expected {
 		if actual[i] != v {
 			t.Errorf("Expected %s at index %d, got %s", v, i, actual[i])
@@ -26,7 +26,7 @@ func TestRPUSH(t *testing.T) {
 	store.RPUSH("mylist", "value2")
 
 	expected := []string{"value1", "value2"}
-	actual := store.LRANGE("mylist", 0, -1)
+	actual, _ := store.LRANGE("mylist", 0, -1)
 	for i, v := range expected {
 		if actual[i] != v {
 			t.Errorf("Expected %s at index %d, got %s", v, i, actual[i])
@@ -48,7 +48,7 @@ func TestLPOP(t *testing.T) {
 	}
 
 	expected := []string{"value1"}
-	actual := store.LRANGE("mylist", 0, -1)
+	actual, _ := store.LRANGE("mylist", 0, -1)
 	for i, v := range expected {
 		if actual[i] != v {
 			t.Errorf("Expected %s at index %d, got %s", v, i, actual[i])
@@ -70,7 +70,7 @@ func TestRPOP(t *testing.T) {
 	}
 
 	expected := []string{"value1"}
-	actual := store.LRANGE("mylist", 0, -1)
+	actual, _ := store.LRANGE("mylist", 0, -1)
 	for i, v := range expected {
 		if actual[i] != v {
 			t.Errorf("Expected %s at index %d, got %s", v, i, actual[i])
@@ -84,7 +84,7 @@ func TestLRANGE(t *testing.T) {
 	store.LPUSH("mylist", "value2")
 	store.LPUSH("mylist", "value3")
 
-	actual := store.LRANGE("mylist", 0, 2)
+	actual, _ := store.LRANGE("mylist", 0, 2)
 
 	expected := []string{"value3", "value2", "value1"}
 	for i, v := range expected {
@@ -99,7 +99,7 @@ func TestLRANGEInvalidIndex(t *testing.T) {
 	store.LPUSH("mylist", "value1")
 	store.LPUSH("mylist", "value2")
 
-	actual := store.LRANGE("mylist", -1, -1)
+	actual, _ := store.LRANGE("mylist", -1, -1)
 
 	if len(actual) != 0 {
 		t.Errorf("Expected empty result for invalid range, got %v", actual)
