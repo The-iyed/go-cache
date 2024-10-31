@@ -22,7 +22,19 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `UPDATE <key> <value>` - Update the value of a key if it exists.
   - `GETSET <key> <value>` - Set the value of a key and return its old value.
   - `GETNSUM <channel>` - Retrieve the number of subscribers for a given channel.
-  
+
+- **List Operations**
+  - `LPUSH <key> <value>` - Insert a value at the head of the list.
+  - `RPUSH <key> <value>` - Insert a value at the tail of the list.
+  - `LPOP <key>` - Remove and return the first element of the list.
+  - `RPOP <key>` - Remove and return the last element of the list.
+  - `LRANGE <key> <start> <stop>` - Retrieve a range of elements from the list.
+
+- **Set Operations**
+  - `SADD <key> <value>` - Add a member to a set.
+  - `SREM <key> <value>` - Remove a member from a set.
+  - `SMEMBERS <key>` - Get all the members of a set.
+
 - **Pattern-Based Subscription**
   - `PSUBSCRIBE <pattern>` - Subscribe to channels that match a given pattern. This allows a client to receive messages published to any channel matching the pattern.
   - `PUNSUBSCRIBE <pattern>` - Unsubscribe from channels that match the specified pattern, stopping message delivery.
@@ -38,7 +50,7 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
 
 ## Future Features
 - **Persistence** - Save cache data to disk and load on startup.
-- **Advanced Data Structures** - Implement lists, sets, and other structures.
+- **Advanced Data Structures** - Implement more complex data structures such as sorted sets and hashes.
 - **Replication and Clustering** - Scale out by distributing data across multiple instances.
 
 ## Installation
