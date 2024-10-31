@@ -69,7 +69,11 @@ func handleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStor
 		conn.Write([]byte("Invalid start or stop index\n"))
 		return
 	}
-	values := listStore.LRANGE(key, start, stop)
+	values, err := listStore.LRANGE(key, start, stop)
+	if err != nil {
+		conn.Write([]byte("nil\n"))
+		return
+	}
 	if len(values) == 0 {
 		conn.Write([]byte("nil\n"))
 		return
@@ -87,4 +91,26 @@ func handleLLEN(conn net.Conn, command []string, listStore *liststore.ListStore)
 	key := command[1]
 	length := strconv.Itoa(listStore.LLEN(key))
 	conn.Write([]byte(length + "\n"))
+}
+
+func handleLTRIM(conn net.Conn, command []string, listStore *liststore.ListStore) {
+	if len(command) != 4 {
+		conn.Write([]byte("Usage: LRANGE <key> <start> <stop>\n"))
+		return
+	}
+	key := command[1]
+	start, err1 := strconv.Atoi(command[2])
+	stop, err2 := strconv.Atoi(command[3])
+	if err1 != nil || err2 != nil {
+		conn.Write([]byte("Invalid start or stop index\n"))
+		return
+	}
+	err := listStore.LTRIM(key, start, stop)
+	if err != nil {
+		conn.Write([]byte("nil\n"))
+		return
+	}
+
+	conn.Write([]byte("OK\n"))
+
 }
