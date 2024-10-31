@@ -7,7 +7,6 @@ import (
 	"github.com/go-redis-v1/internal/liststore"
 )
 
-
 func handleLPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) < 3 {
 		conn.Write([]byte("Usage: LPUSH <key> <value1> <value2> ...\n"))
@@ -15,10 +14,9 @@ func handleLPUSH(conn net.Conn, command []string, listStore *liststore.ListStore
 	}
 	key := command[1]
 	values := command[2:]
-	listStore.LPUSH(key, values...) 
+	listStore.LPUSH(key, values...)
 	conn.Write([]byte("OK\n"))
 }
-
 
 func handleRPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) < 3 {
@@ -27,10 +25,9 @@ func handleRPUSH(conn net.Conn, command []string, listStore *liststore.ListStore
 	}
 	key := command[1]
 	values := command[2:]
-	listStore.RPUSH(key, values...) 
+	listStore.RPUSH(key, values...)
 	conn.Write([]byte("OK\n"))
 }
-
 
 func handleLPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 2 {
@@ -40,12 +37,11 @@ func handleLPOP(conn net.Conn, command []string, listStore *liststore.ListStore)
 	key := command[1]
 	value, ok := listStore.LPOP(key)
 	if ok {
-		conn.Write([]byte(value + "\n")) 
+		conn.Write([]byte(value + "\n"))
 	} else {
-		conn.Write([]byte("nil\n"))  
+		conn.Write([]byte("nil\n"))
 	}
 }
-
 
 func handleRPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 2 {
@@ -55,12 +51,11 @@ func handleRPOP(conn net.Conn, command []string, listStore *liststore.ListStore)
 	key := command[1]
 	value, ok := listStore.RPOP(key)
 	if ok {
-		conn.Write([]byte(value + "\n")) 
+		conn.Write([]byte(value + "\n"))
 	} else {
-		conn.Write([]byte("nil\n")) 
+		conn.Write([]byte("nil\n"))
 	}
 }
-
 
 func handleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 4 {
@@ -76,10 +71,20 @@ func handleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStor
 	}
 	values := listStore.LRANGE(key, start, stop)
 	if len(values) == 0 {
-		conn.Write([]byte("nil\n"))  
+		conn.Write([]byte("nil\n"))
 		return
 	}
 	for _, value := range values {
-		conn.Write([]byte(value + "\n"))  
+		conn.Write([]byte(value + "\n"))
 	}
+}
+
+func handleLLEN(conn net.Conn, command []string, listStore *liststore.ListStore) {
+	if len(command) != 2 {
+		conn.Write([]byte("Usage: LEN <key>\n"))
+		return
+	}
+	key := command[1]
+	length := strconv.Itoa(listStore.LLEN(key))
+	conn.Write([]byte(length + "\n"))
 }

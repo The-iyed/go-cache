@@ -92,6 +92,8 @@ func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, listStore *lists
 		handleRPOP(conn, command, listStore)
 	case "LRANGE":
 		handleLRANGE(conn, command, listStore)
+	case "LLEN":
+		handleLLEN(conn, command, listStore)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}
