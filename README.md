@@ -21,8 +21,11 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `MGET <key1> [<key2> ...]` - Retrieve multiple values for the given keys.
   - `UPDATE <key> <value>` - Update the value of a key if it exists.
   - `GETSET <key> <value>` - Set the value of a key and return its old value.
-  - `GETNSUM <channel> - Retrive the number of subscribers for a given channel.`
-
+  - `GETNSUM <channel>` - Retrieve the number of subscribers for a given channel.
+  
+- **Pattern-Based Subscription**
+  - `PSUBSCRIBE <pattern>` - Subscribe to channels that match a given pattern. This allows a client to receive messages published to any channel matching the pattern.
+  - `PUNSUBSCRIBE <pattern>` - Unsubscribe from channels that match the specified pattern, stopping message delivery.
 
 - **Automatic Expiration**
   - Automatically cleans up expired keys based on TTL.
