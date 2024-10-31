@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 
+	"github.com/go-redis-v1/internal/liststore"
 	"github.com/go-redis-v1/internal/pubsub"
 	"github.com/go-redis-v1/internal/store"
 )
@@ -14,7 +15,7 @@ var (
 	pubSubStore = pubsub.New()
 )
 
-func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
+func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore, listStore *liststore.ListStore) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -31,11 +32,11 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore) {
 			continue
 		}
 
-		handleCommand(conn, kvStore, command)
+		handleCommand(conn, kvStore, listStore, command)
 	}
 }
 
-func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, listStore *liststore.ListStore, command []string) {
 	switch strings.ToUpper(command[0]) {
 	case "SET":
 		handleSet(conn, kvStore, command)
@@ -81,6 +82,16 @@ func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, command []string
 		handlePatternSubscribe(conn, command)
 	case "PUNSUBSCRIBE":
 		handlePatternUnsubscribe(conn, command)
+	case "LPUSH":
+		handleLPUSH(conn, command, listStore)
+	case "RPUSH":
+		handleRPUSH(conn, command, listStore)
+	case "LPOP":
+		handleLPOP(conn, command, listStore)
+	case "RPOP":
+		handleRPOP(conn, command, listStore)
+	case "LRANGE":
+		handleLRANGE(conn, command, listStore)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}
