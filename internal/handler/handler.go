@@ -77,6 +77,10 @@ func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, command []string
 		handleUnsubscribe(conn, command)
 	case "GETNSUM":
 		handleGetNumSub(conn, command)
+	case "PSUBSCRIBE":
+		handlePatternSubscribe(conn, command)
+	case "PUNSUBSCRIBE":
+		handlePatternUnsubscribe(conn, command)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}
