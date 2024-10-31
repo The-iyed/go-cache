@@ -29,7 +29,8 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `LPOP <key>` - Remove and return the first element of the list.
   - `RPOP <key>` - Remove and return the last element of the list.
   - `LRANGE <key> <start> <stop>` - Retrieve a range of elements from the list.
-
+  - `LLEN <key>` - Returns the length of the list stored at key. If key does not exist, it is interpreted as an empty list and 0 is returned.
+  
 - **Set Operations**
   - `SADD <key> <value>` - Add a member to a set.
   - `SREM <key> <value>` - Remove a member from a set.
