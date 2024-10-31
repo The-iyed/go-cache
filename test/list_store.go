@@ -144,3 +144,40 @@ func TestRPOPEmpty(t *testing.T) {
 		t.Errorf("Expected to not pop a value, but got %s", poppedValue)
 	}
 }
+
+func TestLINDEX(t *testing.T) {
+	store := liststore.NewListStore()
+	store.LPUSH("mylist", "value1")
+	store.LPUSH("mylist", "value2")
+	store.LPUSH("mylist", "value3")
+
+	value, err := store.LINDEX("mylist", 1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if value != "value2" {
+		t.Errorf("Expected 'value2', got %s", value)
+	}
+
+	value, err = store.LINDEX("mylist", -1)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+	if value != "value1" {
+		t.Errorf("Expected 'value1', got %s", value)
+	}
+
+	_, err = store.LINDEX("mylist", 10)
+	if err == nil || !errors.Is(err, errors.New(error_message.OUT_OF_RANGE)) {
+		t.Errorf("Expected out of range error, got %v", err)
+	}
+	_, err = store.LINDEX("mylist", -10)
+	if err == nil || !errors.Is(err, errors.New(error_message.OUT_OF_RANGE)) {
+		t.Errorf("Expected out of range error, got %v", err)
+	}
+
+	_, err = store.LINDEX("nonexistent", 0)
+	if err == nil || !errors.Is(err, errors.New(error_message.NOT_FOUND)) {
+		t.Errorf("Expected not found error, got %v", err)
+	}
+}

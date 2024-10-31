@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net"
 	"strconv"
 
@@ -113,4 +114,23 @@ func handleLTRIM(conn net.Conn, command []string, listStore *liststore.ListStore
 
 	conn.Write([]byte("OK\n"))
 
+}
+
+func handleLINDEX(conn net.Conn, command []string, listStore *liststore.ListStore) {
+	if len(command) < 3 {
+		conn.Write([]byte("ERR: LINDEX requires key and index\n"))
+		return
+	}
+	index, err := strconv.Atoi(command[2])
+	if err != nil {
+		conn.Write([]byte("ERR: Invalid index\n"))
+		return
+	}
+
+	value, err := listStore.LINDEX(command[1], index)
+	if err != nil {
+		conn.Write([]byte(fmt.Sprintf("ERR: %v\n", err)))
+	} else {
+		conn.Write([]byte(fmt.Sprintf("%s\n", value)))
+	}
 }
