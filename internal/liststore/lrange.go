@@ -1,11 +1,18 @@
 package liststore
 
-func (ls *ListStore) LRANGE(key string, start, stop int) []string {
+import (
+	"errors"
+
+	error_message "github.com/go-redis-v1/error"
+)
+
+func (ls *ListStore) LRANGE(key string, start, stop int) ([]string, error) {
 	ls.mu.RLock()
 	defer ls.mu.RUnlock()
+
 	list, exists := ls.lists[key]
 	if !exists {
-		return nil
+		return nil, errors.New(error_message.NOT_FOUND)
 	}
 
 	if start < 0 {
@@ -14,14 +21,10 @@ func (ls *ListStore) LRANGE(key string, start, stop int) []string {
 	if stop < 0 {
 		stop = len(list) + stop
 	}
-	if start < 0 {
-		start = 0
+
+	if start < 0 || stop >= len(list) || start > stop {
+		return nil, errors.New(error_message.OUT_OF_RANGE)
 	}
-	if stop > len(list) {
-		stop = len(list)
-	}
-	if start > stop {
-		return nil
-	}
-	return list[start:stop]
+
+	return list[start : stop+1], nil
 }
