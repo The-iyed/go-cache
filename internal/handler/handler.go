@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 
+	"github.com/go-redis-v1/internal/jsonstore"
 	"github.com/go-redis-v1/internal/liststore"
 	"github.com/go-redis-v1/internal/pubsub"
 	"github.com/go-redis-v1/internal/store"
@@ -15,7 +16,10 @@ var (
 	pubSubStore = pubsub.New()
 )
 
-func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore, listStore *liststore.ListStore) {
+func HandleConnection(conn net.Conn,
+	kvStore *store.KeyValueStore,
+	listStore *liststore.ListStore,
+	jsonStore *jsonstore.JSONStore) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -32,11 +36,15 @@ func HandleConnection(conn net.Conn, kvStore *store.KeyValueStore, listStore *li
 			continue
 		}
 
-		handleCommand(conn, kvStore, listStore, command)
+		handleCommand(conn, kvStore, listStore, jsonStore, command)
 	}
 }
 
-func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, listStore *liststore.ListStore, command []string) {
+func handleCommand(conn net.Conn,
+	kvStore *store.KeyValueStore,
+	listStore *liststore.ListStore,
+	jsonStore *jsonstore.JSONStore,
+	command []string) {
 	switch strings.ToUpper(command[0]) {
 	case "SET":
 		handleSet(conn, kvStore, command)
@@ -98,6 +106,16 @@ func handleCommand(conn net.Conn, kvStore *store.KeyValueStore, listStore *lists
 		handleLTRIM(conn, command, listStore)
 	case "LINDEX":
 		handleLINDEX(conn, command, listStore)
+	case "JSON.SET":
+		handleSetJSON(conn, jsonStore, command)
+	case "JSON.GET":
+		handleGetJSON(conn, jsonStore, command)
+	case "JSON.DEL":
+		handleDeleteJSON(conn, jsonStore, command)
+	case "JSON.UPDATE":
+		handleUpdateJSON(conn, jsonStore, command)
+	case "JSON.TTL":
+		handleTTLJSON(conn, jsonStore, command)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}
