@@ -33,6 +33,13 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - `LTRIM <key> <start> <stop>` - rim an existing list so that it will contain only the specified range of elements specified.
   - `LINDEX <key> <index>` - Retrieve the element at a specific index in the list. Supports negative indices, where -1 is the last element, -2 is the second last, and so on.
 
+- **JSON Store Operations**
+  - `JSON.SET <key> <value>` - Store a JSON object at the specified key.
+  - `JSON.GET <key>` - Retrieve a JSON object from the specified key.
+  - `JSON.DEL <key>` - Delete a JSON object from the store.
+  - `JSON.UPDATE <key> <field> <value>` - Update a field in a JSON object.
+  - `JSON.TTL <key>` - Get the remaining time to live for a JSON object.
+
 - **Set Operations**
   - `SADD <key> <value>` - Add a member to a set.
   - `SREM <key> <value>` - Remove a member from a set.
