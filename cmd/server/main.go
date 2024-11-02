@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/go-redis-v1/internal/jsonstore"
 	"github.com/go-redis-v1/internal/liststore"
 	"github.com/go-redis-v1/internal/store"
+	"github.com/go-redis-v1/logger"
 )
 
 func main() {
@@ -21,8 +21,9 @@ func main() {
 	}
 	defer listener.Close()
 
-	fmt.Println("Server is running on port 6379")
-	fmt.Println("System is ready to accept connections")
+	logger.Info("Server is running on port 6379")
+	logger.Info("Server initialized")
+	logger.Info("Ready to accept connections tcp")
 
 	for {
 		conn, err := listener.Accept()
