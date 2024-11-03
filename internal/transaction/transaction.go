@@ -1,17 +1,18 @@
 package transaction
 
 type Command struct {
+	Name string
 	Args []string
 }
 
 type Transaction struct {
-	IsActive bool
 	Commands []Command
+	IsActive bool
 }
 
 func NewTransaction() *Transaction {
 	return &Transaction{
 		IsActive: true,
-		Commands: make([]Command, 0),
+		Commands: []Command{},
 	}
 }
