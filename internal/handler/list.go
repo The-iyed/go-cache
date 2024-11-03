@@ -8,7 +8,7 @@ import (
 	"github.com/go-redis-v1/internal/liststore"
 )
 
-func handleLPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) < 3 {
 		conn.Write([]byte("Usage: LPUSH <key> <value1> <value2> ...\n"))
 		return
@@ -19,7 +19,7 @@ func handleLPUSH(conn net.Conn, command []string, listStore *liststore.ListStore
 	conn.Write([]byte("OK\n"))
 }
 
-func handleRPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleRPUSH(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) < 3 {
 		conn.Write([]byte("Usage: RPUSH <key> <value1> <value2> ...\n"))
 		return
@@ -30,7 +30,7 @@ func handleRPUSH(conn net.Conn, command []string, listStore *liststore.ListStore
 	conn.Write([]byte("OK\n"))
 }
 
-func handleLPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: LPOP <key>\n"))
 		return
@@ -44,7 +44,7 @@ func handleLPOP(conn net.Conn, command []string, listStore *liststore.ListStore)
 	}
 }
 
-func handleRPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleRPOP(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: RPOP <key>\n"))
 		return
@@ -58,7 +58,7 @@ func handleRPOP(conn net.Conn, command []string, listStore *liststore.ListStore)
 	}
 }
 
-func handleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 4 {
 		conn.Write([]byte("Usage: LRANGE <key> <start> <stop>\n"))
 		return
@@ -84,7 +84,7 @@ func handleLRANGE(conn net.Conn, command []string, listStore *liststore.ListStor
 	}
 }
 
-func handleLLEN(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLLEN(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: LEN <key>\n"))
 		return
@@ -94,7 +94,7 @@ func handleLLEN(conn net.Conn, command []string, listStore *liststore.ListStore)
 	conn.Write([]byte(length + "\n"))
 }
 
-func handleLTRIM(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLTRIM(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) != 4 {
 		conn.Write([]byte("Usage: LRANGE <key> <start> <stop>\n"))
 		return
@@ -116,7 +116,7 @@ func handleLTRIM(conn net.Conn, command []string, listStore *liststore.ListStore
 
 }
 
-func handleLINDEX(conn net.Conn, command []string, listStore *liststore.ListStore) {
+func HandleLINDEX(conn net.Conn, command []string, listStore *liststore.ListStore) {
 	if len(command) < 3 {
 		conn.Write([]byte("ERR: LINDEX requires key and index\n"))
 		return

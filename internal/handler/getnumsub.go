@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func handleGetNumSub(conn net.Conn, command []string) {
+func HandleGetNumSub(conn net.Conn, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: GETNSUB <channel> \n"))
 		return

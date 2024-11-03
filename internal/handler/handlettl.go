@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleTTL(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleTTL(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: TTL <key>\n"))
 		return

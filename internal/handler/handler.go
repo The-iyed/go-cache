@@ -36,86 +36,86 @@ func HandleConnection(conn net.Conn,
 			continue
 		}
 
-		handleCommand(conn, kvStore, listStore, jsonStore, command)
+		HandleCommand(conn, kvStore, listStore, jsonStore, command)
 	}
 }
 
-func handleCommand(conn net.Conn,
+func HandleCommand(conn net.Conn,
 	kvStore *store.KeyValueStore,
 	listStore *liststore.ListStore,
 	jsonStore *jsonstore.JSONStore,
 	command []string) {
 	switch strings.ToUpper(command[0]) {
 	case "SET":
-		handleSet(conn, kvStore, command)
+		HandleSet(conn, kvStore, command)
 	case "SETEX":
-		handleSetEX(conn, kvStore, command)
+		HandleSetEX(conn, kvStore, command)
 	case "GET":
-		handleGet(conn, kvStore, command)
+		HandleGet(conn, kvStore, command)
 	case "DEL":
-		handleDel(conn, kvStore, command)
+		HandleDel(conn, kvStore, command)
 	case "KEYS":
-		handleKeys(conn, kvStore, command)
+		HandleKeys(conn, kvStore, command)
 	case "EXISTS":
-		handleExists(conn, kvStore, command)
+		HandleExists(conn, kvStore, command)
 	case "TTL":
-		handleTTL(conn, kvStore, command)
+		HandleTTL(conn, kvStore, command)
 	case "FLUSHALL":
-		handleFlushAll(conn, kvStore)
+		HandleFlushAll(conn, kvStore)
 	case "INFO":
-		handleInfo(conn, kvStore)
+		HandleInfo(conn, kvStore)
 	case "PING":
-		handlePing(conn, kvStore)
+		HandlePing(conn, kvStore)
 	case "PERSIST":
-		handlePersist(conn, kvStore, command)
+		HandlePersist(conn, kvStore, command)
 	case "EXPIRE":
-		handleExpire(conn, kvStore, command)
+		HandleExpire(conn, kvStore, command)
 	case "MSET":
-		handleMSet(conn, kvStore, command)
+		HandleMSet(conn, kvStore, command)
 	case "MGET":
-		handleMGet(conn, kvStore, command)
+		HandleMGet(conn, kvStore, command)
 	case "UPDATE":
-		handleUpdate(conn, kvStore, command)
+		HandleUpdate(conn, kvStore, command)
 	case "GETSET":
-		handleGetSet(conn, kvStore, command)
+		HandleGetSet(conn, kvStore, command)
 	case "PUBLISH":
-		handlePublish(conn, command)
+		HandlePublish(conn, command)
 	case "SUBSCRIBE":
-		handleSubscribe(conn, command)
+		HandleSubscribe(conn, command)
 	case "UNSUBSCRIBE":
-		handleUnsubscribe(conn, command)
+		HandleUnsubscribe(conn, command)
 	case "GETNSUM":
-		handleGetNumSub(conn, command)
+		HandleGetNumSub(conn, command)
 	case "PSUBSCRIBE":
-		handlePatternSubscribe(conn, command)
+		HandlePatternSubscribe(conn, command)
 	case "PUNSUBSCRIBE":
-		handlePatternUnsubscribe(conn, command)
+		HandlePatternUnsubscribe(conn, command)
 	case "LPUSH":
-		handleLPUSH(conn, command, listStore)
+		HandleLPUSH(conn, command, listStore)
 	case "RPUSH":
-		handleRPUSH(conn, command, listStore)
+		HandleRPUSH(conn, command, listStore)
 	case "LPOP":
-		handleLPOP(conn, command, listStore)
+		HandleLPOP(conn, command, listStore)
 	case "RPOP":
-		handleRPOP(conn, command, listStore)
+		HandleRPOP(conn, command, listStore)
 	case "LRANGE":
-		handleLRANGE(conn, command, listStore)
+		HandleLRANGE(conn, command, listStore)
 	case "LLEN":
-		handleLLEN(conn, command, listStore)
+		HandleLLEN(conn, command, listStore)
 	case "LTRIM":
-		handleLTRIM(conn, command, listStore)
+		HandleLTRIM(conn, command, listStore)
 	case "LINDEX":
-		handleLINDEX(conn, command, listStore)
+		HandleLINDEX(conn, command, listStore)
 	case "JSON.SET":
-		handleSetJSON(conn, jsonStore, command)
+		HandleSetJSON(conn, jsonStore, command)
 	case "JSON.GET":
-		handleGetJSON(conn, jsonStore, command)
+		HandleGetJSON(conn, jsonStore, command)
 	case "JSON.DEL":
-		handleDeleteJSON(conn, jsonStore, command)
+		HandleDeleteJSON(conn, jsonStore, command)
 	case "JSON.UPDATE":
-		handleUpdateJSON(conn, jsonStore, command)
+		HandleUpdateJSON(conn, jsonStore, command)
 	case "JSON.TTL":
-		handleTTLJSON(conn, jsonStore, command)
+		HandleTTLJSON(conn, jsonStore, command)
 	default:
 		conn.Write([]byte("Unknown command\n"))
 	}

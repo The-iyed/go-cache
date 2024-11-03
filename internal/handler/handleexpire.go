@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleExpire(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleExpire(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 3 {
 		conn.Write([]byte("Usage: EXPIRE <key> <seconds>\n"))
 		return

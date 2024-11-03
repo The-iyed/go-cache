@@ -6,7 +6,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleUpdate(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleUpdate(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 3 {
 		conn.Write([]byte("Usage: UPDATE <key> <value>\n"))
 		return

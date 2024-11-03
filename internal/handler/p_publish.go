@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func handlePatternSubscribe(conn net.Conn, command []string) {
+func HandlePatternSubscribe(conn net.Conn, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Invalid PSUBSCRIBE command\n"))
 		return

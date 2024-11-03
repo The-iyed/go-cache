@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func handlePatternUnsubscribe(conn net.Conn, command []string) {
+func HandlePatternUnsubscribe(conn net.Conn, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Invalid PUNSUBSCRIBE command\n"))
 		return

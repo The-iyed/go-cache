@@ -4,7 +4,7 @@ import (
 	"net"
 )
 
-func handleSubscribe(conn net.Conn, command []string) {
+func HandleSubscribe(conn net.Conn, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: SUBSCRIBE <channel>\n"))
 		return

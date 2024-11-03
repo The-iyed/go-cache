@@ -4,7 +4,7 @@ import (
 	"net"
 )
 
-func handlePublish(conn net.Conn, command []string) {
+func HandlePublish(conn net.Conn, command []string) {
 	if len(command) != 3 {
 		conn.Write([]byte("Usage: PUBLISH <channel> <message>\n"))
 		return
