@@ -7,7 +7,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleSetEX(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleSetEX(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 4 {
 		conn.Write([]byte("Usage: SETEX <key> <value> <ttl>\n"))
 		return

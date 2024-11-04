@@ -6,7 +6,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleSet(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleSet(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 3 {
 		conn.Write([]byte("Usage: SET <key> <value>\n"))
 		return

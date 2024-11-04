@@ -11,7 +11,7 @@ import (
 	"github.com/go-redis-v1/internal/jsonstore"
 )
 
-func handleSetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
+func HandleSetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
 	if len(command) < 3 {
 		conn.Write([]byte("ERR wrong number of arguments for 'SETJSON' command\n"))
 		return
@@ -41,7 +41,7 @@ func handleSetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []stri
 	conn.Write([]byte("OK\n"))
 }
 
-func handleGetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
+func HandleGetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("ERR wrong number of arguments for 'GETJSON' command\n"))
 		return
@@ -60,7 +60,7 @@ func handleGetJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []stri
 	conn.Write([]byte("\n"))
 }
 
-func handleDeleteJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
+func HandleDeleteJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("ERR wrong number of arguments for 'DELJSON' command\n"))
 		return
@@ -74,7 +74,7 @@ func handleDeleteJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []s
 	}
 }
 
-func handleUpdateJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
+func HandleUpdateJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
 	if len(command) < 4 {
 		conn.Write([]byte("ERR wrong number of arguments for 'UPDATEJSON' command\n"))
 		return
@@ -97,7 +97,7 @@ func handleUpdateJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []s
 	conn.Write([]byte("OK\n"))
 }
 
-func handleTTLJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
+func HandleTTLJSON(conn net.Conn, jsonStore *jsonstore.JSONStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("ERR wrong number of arguments for 'TTL' command\n"))
 		return

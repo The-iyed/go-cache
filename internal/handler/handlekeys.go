@@ -8,7 +8,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-func handleKeys(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandleKeys(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: KEYS <pattern>\n"))
 		return

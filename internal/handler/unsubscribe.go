@@ -2,7 +2,7 @@ package handler
 
 import "net"
 
-func handleUnsubscribe(conn net.Conn, command []string) {
+func HandleUnsubscribe(conn net.Conn, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: UNSUBSCRIBE <channel>\n"))
 		return

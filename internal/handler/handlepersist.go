@@ -6,8 +6,7 @@ import (
 	"github.com/go-redis-v1/internal/store"
 )
 
-
-func handlePersist(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
+func HandlePersist(conn net.Conn, kvStore *store.KeyValueStore, command []string) {
 	if len(command) != 2 {
 		conn.Write([]byte("Usage: PERSIST <key>\n"))
 		return
