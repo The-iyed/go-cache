@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net"
 
 	"github.com/go-redis-v1/internal/jsonstore"
