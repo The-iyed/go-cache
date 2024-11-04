@@ -8,6 +8,7 @@ import (
 	"github.com/go-redis-v1/internal/jsonstore"
 	"github.com/go-redis-v1/internal/liststore"
 	"github.com/go-redis-v1/internal/store"
+	"github.com/go-redis-v1/internal/transaction"
 	"github.com/go-redis-v1/logger"
 )
 
@@ -15,6 +16,7 @@ func main() {
 	kvStore := store.NewKeyValueStore()
 	listStore := liststore.NewListStore()
 	jsonStore := jsonstore.NewJSONStore()
+	transaction := transaction.NewTransaction()
 	listener, err := net.Listen("tcp", ":6379")
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
@@ -31,6 +33,6 @@ func main() {
 			log.Println("Failed to accept connection:", err)
 			continue
 		}
-		go handler.HandleConnection(conn, kvStore, listStore, jsonStore)
+		go handler.HandleConnection(conn, kvStore, listStore, jsonStore, transaction)
 	}
 }

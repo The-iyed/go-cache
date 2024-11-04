@@ -12,7 +12,7 @@ type Transaction struct {
 
 func NewTransaction() *Transaction {
 	return &Transaction{
-		IsActive: true,
+		IsActive: false,
 		Commands: []Command{},
 	}
 }

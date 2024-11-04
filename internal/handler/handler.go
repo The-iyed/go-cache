@@ -10,6 +10,7 @@ import (
 	"github.com/go-redis-v1/internal/liststore"
 	"github.com/go-redis-v1/internal/pubsub"
 	"github.com/go-redis-v1/internal/store"
+	"github.com/go-redis-v1/internal/transaction"
 )
 
 var (
@@ -19,7 +20,8 @@ var (
 func HandleConnection(conn net.Conn,
 	kvStore *store.KeyValueStore,
 	listStore *liststore.ListStore,
-	jsonStore *jsonstore.JSONStore) {
+	jsonStore *jsonstore.JSONStore,
+	transaction *transaction.Transaction) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -35,8 +37,22 @@ func HandleConnection(conn net.Conn,
 			conn.Write([]byte("Invalid command\n"))
 			continue
 		}
-
-		HandleCommand(conn, kvStore, listStore, jsonStore, command)
+		switch strings.ToUpper(command[0]) {
+		case "MULTI":
+			transaction.StartTransaction()
+			conn.Write([]byte("OK: Transaction started\n"))
+		case "EXEC":
+			CommitTransaction(conn, kvStore, listStore, jsonStore, transaction)
+		case "DISCARD":
+			err := transaction.AbortTransaction()
+			if err != nil {
+				conn.Write([]byte("ERR: " + err.Error() + "\n"))
+				return
+			}
+			conn.Write([]byte("OK: Transaction discarded\n"))
+		default:
+			HandleCommand(conn, kvStore, listStore, jsonStore, transaction, command)
+		}
 	}
 }
 
@@ -44,7 +60,15 @@ func HandleCommand(conn net.Conn,
 	kvStore *store.KeyValueStore,
 	listStore *liststore.ListStore,
 	jsonStore *jsonstore.JSONStore,
+	transaction *transaction.Transaction,
 	command []string) {
+
+	if transaction.IsActive {
+		transaction.AddCommand(strings.ToUpper(command[0]), command)
+		conn.Write([]byte("QUEUED\n"))
+		return
+	}
+
 	switch strings.ToUpper(command[0]) {
 	case "SET":
 		HandleSet(conn, kvStore, command)

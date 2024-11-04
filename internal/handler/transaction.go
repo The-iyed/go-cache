@@ -9,7 +9,7 @@ import (
 	"github.com/go-redis-v1/internal/transaction"
 )
 
-func Execute(conn net.Conn,
+func CommitTransaction(conn net.Conn,
 	kvStore *store.KeyValueStore,
 	listStore *liststore.ListStore,
 	jsonStore *jsonstore.JSONStore,
@@ -94,8 +94,11 @@ func Execute(conn net.Conn,
 			HandleTTLJSON(conn, jsonStore, command)
 		default:
 			conn.Write([]byte("ERROR: Unknown command " + cmd.Name + "\n"))
+			transaction.IsActive = false
 			return
 		}
 	}
 	transaction.IsActive = false
+	transaction.Commands = nil
+	conn.Write([]byte("OK: Transaction committed\n"))
 }
