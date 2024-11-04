@@ -58,6 +58,11 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
   - **UNSUBSCRIBE <channel>** - Unsubscribe from a specified channel, stopping message delivery.
   - **Message Persistence** - Stores recent messages in a buffer for each channel, allowing new subscribers to catch up on recent messages upon joining.
 
+- **Transaction Support**
+  - `MULTI` - Start a transaction. This command marks the beginning of a transaction block.
+  - `EXEC` - Execute all commands issued after `MULTI` and discard the transaction if an error occurs.
+  - `DISCARD` - Abort the transaction, discarding all commands issued after `MULTI`.
+
 ## Future Features
 - **Persistence** - Save cache data to disk and load on startup.
 - **Advanced Data Structures** - Implement more complex data structures such as sorted sets and hashes.
