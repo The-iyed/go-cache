@@ -75,13 +75,9 @@ ICache is a high-performance, in-memory key-value store designed to provide fast
     git clone https://github.com/yourusername/ICache.git
     cd ICache
     ```
-2. Install dependencies:
+2. Run the server:
     ```bash
-    go mod tidy
-    ```
-3. Run the server:
-    ```bash
-    go run cmd/server/main.go
+    docker compose up
     ```
 
 ## Usage
